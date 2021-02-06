@@ -6,7 +6,7 @@ import os
 import pathlib
 from keras.models import Sequential
 from keras.layers.core import Dense
-
+from keras.models import load_model
 
 
 import matplotlib.pyplot as plt
@@ -162,15 +162,16 @@ def main():
             #df3=pd.concat([df3,s7], axis =1)
 
             WEIGHTS = table+"Weight"
-            files0 = pathlib.Path(WEIGHTS+".0")
+            files0 = pathlib.Path(WEIGHTS+".h5")
             if files0.exists ():
-                model.load_weights(WEIGHTS)
+                model = load_model(files0)
                 print("file exists")
             else:
                 print("file doesnt exists")
 
             train = df4.replace(np.nan, 0)
             target = df3.replace(np.nan, 0)
+            print(len(df4))
             model = Sequential()
             model.add(Dense(176, input_dim=88, activation='relu'))
             model.add(Dense(352, activation='relu'))
@@ -181,8 +182,9 @@ def main():
                           optimizer='adam',
                           metrics=['binary_accuracy'])
 
-            model.fit(train, target, epochs=50000, verbose=2)
-            existingModel.save_weights(WEIGHTS)
+            model.fit(train, target, epochs=500, verbose=2)
+            #existingModel.save_weights(WEIGHTS+".h5")
+            model.save(files0,overwrite=True)
             print(model.predict(train).round())
 
 if __name__ == '__main__':
