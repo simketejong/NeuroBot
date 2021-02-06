@@ -164,48 +164,26 @@ def main():
             WEIGHTS = table+"Weight"
             files0 = pathlib.Path(WEIGHTS+".0")
             if files0.exists ():
-                file = open(files0, "rb")
-                syn0 = np.load(file)
+                model.load_weights(WEIGHTS)
                 print("file exists")
             else:
                 print("file doesnt exists")
-                syn0 = 2*np.random.random((88,800)) - 1
-            files1 = pathlib.Path(WEIGHTS+".1")
-            if files1.exists ():
-                file = open(files1, "rb")
-                syn1 = np.load(file)
-                print("file exists")
-            else:
-                print("file doesnt exists")
-                syn1 = 2*np.random.random((800,2)) - 1
-            df4 = df4.replace(np.nan, 0)
-            df3 = df3.replace(np.nan, 0)
-            for teller in range(len(df4)):
-                tot = teller + 1
-                X = df4[teller:tot].to_numpy()
-                y = df3[teller:tot].to_numpy()
-                Y = y.T
-                for j in range(30):
-                    l1 = 1/(1+np.exp(-(np.dot(X,syn0))))
-                    l2 = 1/(1+np.exp(-(np.dot(l1,syn1))))
-                    l2_delta = (y - l2)*(l2*(1-l2))
-                    l1_delta = l2_delta.dot(syn1.T) * (l1 * (1-l1))
-                    syn1 += l1.T.dot(l2_delta)
-                    syn0 += X.T.dot(l1_delta)
-                print ("Output After Training:")
-                print("Teller = "+ str(teller)+" error = "+ str(np.mean(np.abs(y - l2))))
-            file0 = open(files0, "wb")
-            np.save(file0,syn0)
-            file0.close
-            file1 = open(files1, "wb")
-            np.save(file1,syn1)
-            file1.close
-            for teller in range(len(df4)):
-                tot = teller + 1
-                X = df4[teller:tot].to_numpy()
-                l1 = 1 / (1 + np.exp(-(np.dot(X, syn0))))
-                l2 = 1 / (1 + np.exp(-(np.dot(l1, syn1))))
-                print ("waarde l2 = "+str(l2))
+
+            train = df4.replace(np.nan, 0)
+            target = df3.replace(np.nan, 0)
+            model = Sequential()
+            model.add(Dense(176, input_dim=88, activation='relu'))
+            model.add(Dense(352, activation='relu'))
+            model.add(Dense(88, activation='relu'))
+            model.add(Dense(2, activation='sigmoid'))
+
+            model.compile(loss='mean_squared_error',
+                          optimizer='adam',
+                          metrics=['binary_accuracy'])
+
+            model.fit(train, target, epochs=50000, verbose=2)
+            existingModel.save_weights(WEIGHTS)
+            print(model.predict(train).round())
 
 if __name__ == '__main__':
     os.system("cp Neural.sqlite.org Neural.sqlite")
