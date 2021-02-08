@@ -1,0 +1,147 @@
+{
+    "max_open_trades": 2,
+    "stake_currency": "EUR",
+    "stake_amount" : 20,
+    "tradable_balance_ratio": 0.99,
+    "fiat_display_currency": "EUR",
+    "timeframe": "5m",
+    "dry_run": false,
+    "dry_run_wallet" : 100,
+    "cancel_open_orders_on_exit": false,
+    "unfilledtimeout": {
+        "buy": 10,
+        "sell": 30
+    },
+    "bid_strategy": {
+        "use_order_book": false,
+        "ask_last_balance": 0.0,
+        "order_book_top": 1,
+        "check_depth_of_market": {
+            "enabled": false,
+            "bids_to_ask_delta": 1
+        }
+    },
+    "ask_strategy":{
+        "use_order_book": false,
+        "order_book_min": 1,
+        "order_book_max": 1,
+        "use_sell_signal": true,
+        "sell_profit_only": true,
+        "ignore_roi_if_buy_signal": false
+    },
+    "exchange": {
+        "name": "kraken",
+        "key": "KSae7taUC57Az0REQQpxNWu2HoXHlakYNtZxObsTZ5I9O5j/fh0s8ckt",
+        "secret": "w1ukcBaSto1Ndvg82J2udhupSyzPBeiKGt7uz8i9MEJgEIP74yMY0LQuiRH0zWTxQoSVGWpLFgC0G1YWeoolAw==",
+        "ccxt_config": {"enableRateLimit": true},
+        "ccxt_async_config": {
+            "enableRateLimit": true,
+            "rateLimit": 3200
+        },
+        "pair_whitelist": [
+           "ADA/EUR",
+            "ALGO/EUR",
+            "ANT/EUR",
+            "ATOM/EUR",
+            "BAL/EUR",
+            "BAT/EUR",
+            "BCH/EUR",
+            "BTC/EUR",
+            "COMP/EUR",
+            "CRV/EUR",
+            "DAI/EUR",
+            "DASH/EUR",
+            "DOGE/EUR",
+            "DOT/EUR",
+            "EOS/EUR",
+            "ETC/EUR",
+            "ETH/EUR",
+            "FIL/EUR",
+            "GNO/EUR",
+            "GRT/EUR",
+            "ICX/EUR",
+            "KAVA/EUR",
+            "KEEP/EUR",
+            "KNC/EUR",
+            "KSM/EUR",
+            "LINK/EUR",
+            "LSK/EUR",
+            "LTC/EUR",
+            "MANA/EUR",
+            "MLN/EUR",
+            "NANO/EUR",
+            "OMG/EUR",
+            "OXT/EUR",
+            "PAXG/EUR",
+            "QTUM/EUR",
+            "REP/EUR",
+            "REPV1/EUR",
+            "SC/EUR",
+            "SNX/EUR",
+            "STORJ/EUR",
+            "TBTC/EUR",
+            "TRX/EUR",
+            "UNI/EUR",
+            "USDC/EUR",
+            "USDT/EUR",
+            "WAVES/EUR",
+            "XLM/EUR",
+            "XMR/EUR",
+            "XRP/EUR",
+            "XTZ/EUR",
+            "YFI/EUR",
+            "ZEC/EUR"
+        ],
+        "pair_blacklist": [
+        ]
+    },
+    "pairlists": [
+        {"method": "StaticPairList"}
+    ],
+    "edge": {
+        "enabled": false,
+        "process_throttle_secs": 3600,
+        "calculate_since_number_of_days": 7,
+        "allowed_risk": 0.01,
+        "stoploss_range_min": -0.01,
+        "stoploss_range_max": -0.1,
+        "stoploss_range_step": -0.01,
+        "minimum_winrate": 0.60,
+        "minimum_expectancy": 0.20,
+        "min_trade_number": 10,
+        "max_trade_duration_minute": 1440,
+        "remove_pumps": false
+    },
+    "telegram": {
+        "enabled": false,
+        "token": "your_telegram_token",
+        "chat_id": "your_telegram_chat_id"
+    },
+    "api_server": {
+        "enabled": true,
+        "listen_ip_address": "192.168.1.13",
+        "listen_port": 2320,
+        "verbosity": "info",
+        "CORS_origins": ["http://192.168.1.13:2320"],
+        "username": "freqtrader",
+        "password": "deadfred"
+    },
+    "db_url": "sqlite:///tradesv3.sqlite",
+    "initial_state": "running",
+    "forcebuy_enable": false,
+    "internals": {
+        "process_throttle_secs": 5,
+        "heartbeat_interval": 60
+    },
+    "disable_dataframe_checks": false,
+    "strategy": "BotE",
+    "strategy_path": "user_data/strategies/",
+    "dataformat_ohlcv": "json",
+    "dataformat_trades": "jsongz",
+    "initial_state": "running",
+    "forcebuy_enable": false,
+    "internals": {
+        "process_throttle_secs": 5
+    },
+    "download_trades": true
+}
