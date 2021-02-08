@@ -24,9 +24,9 @@ def main():
         print("Database connected:")
         cursor = conn.cursor()
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        Table_Array=cursor.fetchall()
-        for aantalTables in range(len(Table_Array)):
-            table = str(Table_Array[0]).replace('\'','')
+        table_Array=cursor.fetchall()
+        for aantalTables in range(len(table_Array)):
+            table = str(table_Array[0]).replace('\'','')
             table = table.replace(',','')
             table = table.replace('(','')
             table = table.replace(')','')
@@ -35,16 +35,14 @@ def main():
             df1 = df.drop(columns=['index', 'date', 'open'])
             df2 = df1.tail(1)
             WEIGHTS = table+"Weight"
-            files0 = pathlib.Path(WEIGHTS+".h5")
-            if files0.exists ():
+            files0 = pathlib.Path(WEIGHTS"_model.h5")
+            if files0.exists():
                 model = load_model(files0)
+                files0 = pathlib.Path(WEIGHTS + ".h5")
+                if files0.exists():
+                    model.load_weights(files0)
                 train = df2.replace(np.nan, 0)
-                #print(str(train))
-                #print(model.predict(train).round())
                 print(model.predict(train))
-                #print("file exists")
-            #else:
-                #print("file doesnt exists")
 
 if __name__ == '__main__':
     main()

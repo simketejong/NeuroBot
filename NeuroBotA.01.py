@@ -3,6 +3,7 @@ from sqlite3 import Error
 import pandas as pd
 import numpy as np
 import os
+import time
 import pathlib
 from keras.models import Sequential
 from keras.layers.core import Dense
@@ -25,9 +26,8 @@ def create_connection(db_file):
 
 def main():
     database = r"/home/ekmis/freqtrade/Neural.sqlite"
-#    TABLE_NAME = "ZEC_EUR"
     conn = create_connection(database)
-    teken = 1
+    zien=1
     dagen = 1
     with conn:
         print("Database connected:")
@@ -35,16 +35,16 @@ def main():
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
         Table_Array=cursor.fetchall()
         for aantalTables in range(len(Table_Array)):
-            table = str(Table_Array[0]).replace('\'','')
+            table = str(Table_Array[aantalTables]).replace('\'','')
             table = table.replace(',','')
             table = table.replace('(','')
             table = table.replace(')','')
             print(table)
+            zien = 1
             df = fetch_table_data_into_df(table, conn)
             for col in df.columns:
                 if col == "sell":
                     df.drop(["sell","buy","gemiddeld","x3","x2","x1","x0"], axis=1)
-#        for teller in df.index:
             lengte=len(df.index)
             sell = []
             buy = []
@@ -111,83 +111,53 @@ def main():
                 else:
                     buy[teller]=0
 
-                if teller == teken*256:
+                if teller == zien*256:
                     plt.plot(y)
                     X1=[teller,tot]
                     Y1=[gemiddeld[teller],gemiddeld[teller]]
                     Max=[gemiddeld[teller]+MaxArray,gemiddeld[teller]+MaxArray]
                     Min=[gemiddeld[teller]+MinArray,gemiddeld[teller]+MinArray]
+                    plt.title(table)
                     plt.plot(X1, Y1, label = "average")
                     plt.plot(X2, Y2, label = "polyfit")
                     plt.plot(X1, Max, label = "Max")
                     plt.plot(X1, Min, label = "Min")
                     plt.legend(loc='best')
                     plt.savefig('foo.pdf')
-                    teken=teken+1
+                    zien=zien+1
                     print("Sell = " +str(sell[teller])+ " Buy = "+ str(buy[teller]))
 
-            #s1=pd.Series(sell, name="sell")
-            #df2=pd.concat([df,s1], axis =1)
-            #s2=pd.Series(buy, name="buy")
-            #df2=pd.concat([df2,s2], axis =1)
-            #s3=pd.Series(gemiddeld, name="gemiddeld")
-            #df2=pd.concat([df2,s3], axis =1)
-            #s4=pd.Series(x3, name="x3")
-            #df2=pd.concat([df2,s4], axis =1)
-            #s5=pd.Series(x2, name="x2")
-            #df2=pd.concat([df2,s5], axis =1)
-            #s6=pd.Series(x1, name="x1")
-            #df2=pd.concat([df2,s6], axis =1)
-            #s7=pd.Series(x0, name="x0")
-            #df2=pd.concat([df2,s7], axis =1)
-            #    for col in df2.columns:
-            #        print(col)
-            #df2 = df2.drop(columns=['index', 'date', 'open'])
-            #for col in df2.columns:
-            #    print(col)
-            #print(str(df2))
             df4= df.drop(columns=['index', 'date', 'open'])
             df3=pd.Series(sell, name="sell")
             s2=pd.Series(buy, name="buy")
             df3=pd.concat([df3,s2], axis =1)
-            #s3=pd.Series(gemiddeld, name="gemiddeld")
-            #df3=pd.concat([df3,s3], axis =1)
-            #s4=pd.Series(x3, name="x3")
-            #df3=pd.concat([df3,s4], axis =1)
-            #s5=pd.Series(x2, name="x2")
-            #df3=pd.concat([df3,s5], axis =1)
-            #s6=pd.Series(x1, name="x1")
-            #df3=pd.concat([df3,s6], axis =1)
-            #s7=pd.Series(x0, name="x0")
-            #df3=pd.concat([df3,s7], axis =1)
-
-            WEIGHTS = table+"Weight"
-            files0 = pathlib.Path(WEIGHTS+".h5")
-            if files0.exists ():
-                model = load_model(files0)
-                print("file exists")
-            else:
-                print("file doesnt exists")
-
             train = df4.replace(np.nan, 0)
             target = df3.replace(np.nan, 0)
-            print(len(df4))
             model = Sequential()
             model.add(Dense(176, input_dim=88, activation='relu'))
             model.add(Dense(352, activation='relu'))
             model.add(Dense(88, activation='relu'))
             model.add(Dense(2, activation='sigmoid'))
-
             model.compile(loss='mean_squared_error',
-                          optimizer='adam',
-                          metrics=['binary_accuracy'])
-
-            model.fit(train, target, epochs=500, verbose=2)
-            #existingModel.save_weights(WEIGHTS+".h5")
-            model.save(files0,overwrite=True)
-            print(model.predict(train).round())
+                            optimizer='adam',
+                            metrics=['binary_accuracy'])
+            WEIGHTS = table+"Weight"
+            files0 = pathlib.Path("/tmp/"+WEIGHTS+".h5")
+            if files0.exists ():
+                model.load_weights(files0)
+                print("file exists")
+            else:
+                print("file doesnt exists")
+            model.fit(train, target, epochs=100, verbose=2)
+            open("/tmp/"+WEIGHTS+"_wait", 'a').close()
+            time.sleep(10)
+            model.save_weights(files0,overwrite=True)
+            model.save("/tmp/"+WEIGHTS+"_model.h5", overwrite=True)
+            if os.path.exists("/tmp/"+WEIGHTS+"_wait"):
+                os.remove("/tmp/"+WEIGHTS+"_wait")
+#               print(model.predict(train).round())
 
 if __name__ == '__main__':
-    os.system("cp Neural.sqlite.org Neural.sqlite")
+#    os.system("cp Neural.sqlite.org Neural.sqlite")
     main()
 
